@@ -1,0 +1,24 @@
+{
+  "name": "@solar-sales/auth",
+  "type": "module",
+  "exports": {
+    ".": {
+      "default": "./src/index.ts"
+    },
+    "./*": {
+      "default": "./src/*.ts"
+    }
+  },
+  "scripts": {},
+  "dependencies": {
+    "@solar-sales/db": "workspace:*",
+    "@solar-sales/env": "workspace:*",
+    "better-auth": "catalog:",
+    "dotenv": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@solar-sales/config": "workspace:*",
+    "typescript": "catalog:"
+  }
+}
