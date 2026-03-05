@@ -1,24 +1,18 @@
 import type { Metadata } from "next";
 
-import { Geist, Geist_Mono } from "next/font/google";
+import { Roboto } from "next/font/google";
 
 import "../index.css";
-import Header from "@/components/header";
-import Providers from "@/components/providers";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const roboto = Roboto({
+  variable: "--font-roboto",
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "solar-sales",
-  description: "solar-sales",
+  title: "SolarFlow",
+  description: "CRM built for Solar Businesses",
 };
 
 export default function RootLayout({
@@ -28,13 +22,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <Providers>
-          <div className="grid grid-rows-[auto_1fr] h-svh">
-            <Header />
+      <body className={`${roboto.variable} antialiased`}>
+        <main className="flex min-h-screen justify-center">
+          <div className="flex min-h-screen w-full flex-col items-center justify-start">
             {children}
           </div>
-        </Providers>
+        </main>
       </body>
     </html>
   );

@@ -5,6 +5,290 @@ generator client {
   runtime = "bun"
 }
 
+generator valibot {
+  provider = "prisma-valibot-generator"
+  output = "../generated/valibot"
+}
+
 datasource db {
   provider = "postgresql"
+}
+
+enum role {
+  ADMIN
+  MEMBER
+  OWNER
+}
+
+enum memberRole {
+  LEAD_GEN
+  SALES
+}
+
+enum leadStatus {
+  NEW
+  IN_PROGRESS
+  ASSIGNED
+}
+
+enum appointmentStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+}
+
+enum installationStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+}
+
+enum employmentStatus {
+  FULL_TIME
+  PART_TIME
+  RETIRED
+}
+
+enum availableParties {
+  SOLO_OWNER
+  JOINT_OWNER
+}
+
+enum interestedItem {
+  SOLAR_PANELS
+  BATTERY_STORAGE
+  WIND_TURBINES
+}
+
+
+model Users {
+  id            String        @id @default(dbgenerated("pg_catalog.gen_random_uuid()")) @db.Uuid
+  name          String
+  email         String
+  emailVerified Boolean       @default(false)
+  location      Locations?
+  image         String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  sessions      Sessions[]
+  accounts      Accounts[]
+  members       Members[]
+  invitations   Invitations[]
+  leads          Leads[]
+
+  @@unique([email])
+  @@index([name, createdAt])
+  @@map("user")
+}
+
+model Customers {
+  id            String        @id @default(dbgenerated("pg_catalog.gen_random_uuid()")) @db.Uuid
+  name          String
+  email         String?
+  phoneNumber   String?
+  location      Locations?
+
+  image         String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  employmentStatus employmentStatus?
+  availableParties availableParties?
+  billSize       Int?
+  energyProvider  String?
+  interestedItem String?
+  leads         Leads[]
+
+  @@unique([email])
+
+  @@index([name, createdAt])
+  @@map("customer")
+}
+
+model Locations {
+  id        String        @id @default(dbgenerated("pg_catalog.gen_random_uuid()")) @db.Uuid
+  address   String
+  state     String
+  suburb    String
+  zipCode   String
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  customer  Customers?     @relation(fields: [customerId], references: [id])
+  customerId String?       @unique    @db.Uuid
+  user      Users?        @relation(fields: [userId], references: [id])
+  userId    String?       @unique    @db.Uuid
+
+  @@map("location")
+  @@index([customerId, userId, createdAt, updatedAt])
+}
+model Sessions {
+  id                   String   @id @default(dbgenerated("pg_catalog.gen_random_uuid()")) @db.Uuid
+  expiresAt            DateTime
+  token                String
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+  ipAddress            String?
+  userAgent            String?
+  userId               String   @db.Uuid
+  users                Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  activeOrganizationId String?
+
+  @@unique([token])
+  @@index([userId])
+  @@map("sessions")
+}
+
+model Accounts {
+  id                    String    @id @default(dbgenerated("pg_catalog.gen_random_uuid()")) @db.Uuid
+  accountId             String
+  providerId            String
+  userId                String    @db.Uuid
+  users                 Users     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+  @@map("accounts")
+}
+
+model Verifications {
+  id         String   @id @default(dbgenerated("pg_catalog.gen_random_uuid()")) @db.Uuid
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verifications")
+}
+
+model Organizations {
+  id          String        @id @default(dbgenerated("pg_catalog.gen_random_uuid()")) @db.Uuid
+  name        String
+  slug        String
+  logo        String?
+  createdAt   DateTime
+  metadata    String?
+  members     Members[]
+  invitations Invitations[]
+
+  @@unique([slug])
+  @@map("organizations")
+}
+
+model Members {
+  id             String        @id @default(dbgenerated("pg_catalog.gen_random_uuid()")) @db.Uuid
+  organizationId String        @db.Uuid
+  organizations  Organizations @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  userId         String        @db.Uuid
+  users          Users         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role           String        @default("member")
+  memberRole     memberRole?
+  createdAt      DateTime
+
+  @@index([organizationId, memberRole, userId])
+  @@map("members")
+}
+
+model Invitations {
+  id             String        @id @default(dbgenerated("pg_catalog.gen_random_uuid()")) @db.Uuid
+  organizationId String        @db.Uuid
+  organizations  Organizations @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  email          String
+  role           String?
+  status         String        @default("pending")
+  expiresAt      DateTime
+  createdAt      DateTime      @default(now())
+  inviterId      String        @db.Uuid
+  users          Users         @relation(fields: [inviterId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([email])
+  @@map("invitations")
+}
+
+model Leads {
+  id             String        @id @default(dbgenerated("pg_catalog.gen_random_uuid()")) @db.Uuid
+  customer       Customers     @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  customerId     String        @db.Uuid
+  user           Users         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId         String        @db.Uuid
+  status         leadStatus     @default(NEW)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @default(now())
+  note           Notes[]
+  appointment    Appointments?
+  installation   Installations?
+
+
+  @@index([customerId])
+  @@map("leads")
+}
+
+model Notes {
+  id             String        @id @default(dbgenerated("pg_catalog.gen_random_uuid()")) @db.Uuid
+  lead           Leads         @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  leadId         String        @db.Uuid
+  note           String
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @default(now())
+
+  @@index([leadId])
+  @@map("notes")
+}
+
+model Items {
+  id             String        @id @default(dbgenerated("pg_catalog.gen_random_uuid()")) @db.Uuid
+  installation   Installations @relation(fields: [installationId], references: [id], onDelete: Cascade)
+  installationId String        @unique      @db.Uuid
+
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @default(now())
+
+  @@index([installationId])
+  @@map("items")
+}
+
+model Appointments {
+  id          String            @id @default(dbgenerated("pg_catalog.gen_random_uuid()")) @db.Uuid
+  lead        Leads             @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  leadId      String            @unique @db.Uuid // @unique makes it 1:1
+
+  scheduledAt DateTime
+  status      appointmentStatus @default(PENDING)
+
+  // For your "2 days before" confirmation workflow
+  confirmedAt DateTime?
+
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  @@index([leadId])
+  @@map("appointments")
+}
+
+model Installations {
+  id          String            @id @default(dbgenerated("pg_catalog.gen_random_uuid()")) @db.Uuid
+  lead        Leads             @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  leadId      String            @unique @db.Uuid // @unique makes it 1:1
+  item        Items?
+
+  scheduledAt DateTime
+  status      installationStatus @default(PENDING)
+
+  // For your "2 days before" confirmation workflow
+  confirmedAt DateTime?
+
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  @@index([leadId])
+  @@map("installations")
 }
