@@ -76,9 +76,14 @@ model Users {
   invitations   Invitations[]
   leads          Leads[]
 
+  role          String?
+  banned        Boolean?    @default(false)
+  banReason     String?
+  banExpires    DateTime?
+
   @@unique([email])
   @@index([name, createdAt])
-  @@map("user")
+  @@map("users")
 }
 
 model Customers {
@@ -101,7 +106,7 @@ model Customers {
   @@unique([email])
 
   @@index([name, createdAt])
-  @@map("customer")
+  @@map("customers")
 }
 
 model Locations {
@@ -117,7 +122,7 @@ model Locations {
   user      Users?        @relation(fields: [userId], references: [id])
   userId    String?       @unique    @db.Uuid
 
-  @@map("location")
+  @@map("locations")
   @@index([customerId, userId, createdAt, updatedAt])
 }
 model Sessions {
@@ -131,6 +136,8 @@ model Sessions {
   userId               String   @db.Uuid
   users                Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
   activeOrganizationId String?
+
+  impersonatedBy       String?
 
   @@unique([token])
   @@index([userId])

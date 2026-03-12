@@ -11,6 +11,7 @@ import users from "./routes/users";
 import leads from "./routes/leads";
 import customers from "./routes/customers";
 import notes from "./routes/notes";
+import { requireAuth, requireActiveOrg } from "./middleware/auth";
 
 const app = new Hono<{
   Variables: {
@@ -42,8 +43,15 @@ app.use(
   "/*",
   cors({
     origin: env.CORS_ORIGIN,
-    allowMethods: ["GET", "POST", "OPTIONS"],
-    allowHeaders: ["Content-Type", "Authorization"],
+    allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowHeaders: [
+      "Content-Type",
+      "Authorization",
+      "X-Request-Id",
+      "X-Visitor-Id",
+      "X-Requested-With",
+      "Accept",
+    ],
     exposeHeaders: ["Content-Length"],
     credentials: true,
   }),
@@ -56,8 +64,15 @@ app.get("/", (c) => {
 });
 
 app.route("/users", users);
+
+// Protect customers & leads & notes with both auth + active org
+app.use("/customers/*", requireAuth, requireActiveOrg);
 app.route("/customers", customers);
+
+app.use("/leads/*", requireAuth, requireActiveOrg);
 app.route("/leads", leads);
+
+app.use("/notes/*", requireAuth, requireActiveOrg);
 app.route("/notes", notes);
 
 app.get(

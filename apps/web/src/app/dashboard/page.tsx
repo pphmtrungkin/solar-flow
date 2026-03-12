@@ -1,83 +1,41 @@
-"use client";
+"use server";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { headers } from "next/headers";
+import { auth } from "@solar-sales/auth";
 
-import { authClient } from "@/lib/auth-client";
-import { SessionProvider, useSession } from "./session";
+export default async function DashboardPage() {
+  const hdrs = await headers();
 
-type Session = typeof authClient.$Infer.Session;
+  // Get server-side session from Better Auth
+  // Assumes the shape is `{ user, session } | null`
+  const session = await auth.api.getSession({ headers: hdrs });
 
-function SessionGate({ children }: { children: React.ReactNode }) {
-  const [session, setSession] = useState<Session | null>(null);
-  const [loading, setLoading] = useState(true);
-  const router = useRouter();
+  console.log(session);
 
-  useEffect(() => {
-    let cancelled = false;
-
-    async function loadSession() {
-      try {
-        const result = await authClient.getSession();
-        if (cancelled) return;
-
-        if (result.error || !result.data?.user) {
-          // Not authenticated, redirect to login
-          router.replace("/login");
-          return;
-        }
-
-        setSession(result.data);
-      } finally {
-        if (!cancelled) {
-          setLoading(false);
-        }
-      }
-    }
-
-    loadSession();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [router]);
-
-  if (loading) {
-    return (
-      <div className="flex h-full items-center justify-center">
-        <span
-          className="loading loading-spinner"
-          aria-label="Loading session"
-        />
-      </div>
-    );
-  }
-
-  if (!session) {
-    // Redirect is in progress, render nothing to avoid flicker
-    return null;
-  }
-
-  return <SessionProvider value={session}>{children}</SessionProvider>;
-}
-
-function DashboardContent() {
-  const session = useSession();
+  // At this point, user is authenticated AND has an active org
+  const userName = session?.user.name ?? "User";
+  const activeOrgId = session?.session.activeOrganizationId;
 
   return (
     <div className="container mx-auto max-w-3xl px-4 py-4">
       <h1 className="text-2xl font-semibold mb-2">Dashboard</h1>
-      <p className="mb-4">Welcome {session.user?.name ?? "User"}</p>
+      <p className="mb-4">
+        Welcome {userName} (Org: {activeOrgId})
+      </p>
 
-      {/* Add your dashboard content/components here */}
+      {/* Your protected dashboard content here */}
+      <section className="grid gap-4">
+        <div className="card bg-base-200 shadow-sm">
+          <div className="card-body">
+            <h2 className="card-title">Overview</h2>
+            <p className="text-sm text-base-content/70">
+              This dashboard is protected by server-side authentication and
+              organization checks. Only users with an active organization can
+              view this page.
+            </p>
+          </div>
+        </div>
+      </section>
     </div>
-  );
-}
-
-export default function DashboardPage() {
-  return (
-    <SessionGate>
-      <DashboardContent />
-    </SessionGate>
   );
 }

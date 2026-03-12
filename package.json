@@ -34,11 +34,13 @@
     "check": "biome check --write ."
   },
   "dependencies": {
+    "@better-auth/infra": "^0.1.8",
     "@better-auth/prisma-adapter": "^1.5.3",
     "@hono/standard-validator": "^0.2.2",
     "@scalar/hono-api-reference": "^0.9.46",
     "@solar-sales/env": "workspace:*",
     "@valibot/to-json-schema": "^1.5.0",
+    "axios": "^1.13.6",
     "dotenv": "^17.3.1",
     "hono-openapi": "^1.2.0",
     "hono-pino": "^0.10.3",

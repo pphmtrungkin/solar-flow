@@ -2,8 +2,8 @@ import prisma from "@solar-sales/db";
 import { env } from "@solar-sales/env/server";
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
-import { openAPI, organization } from "better-auth/plugins";
-import { ac, admin, owner, member } from "./permissions";
+import { openAPI, organization, admin } from "better-auth/plugins";
+import { ac, admin as adminRole, owner, member } from "./permissions";
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
@@ -13,6 +13,21 @@ export const auth = betterAuth({
   trustedOrigins: [env.CORS_ORIGIN],
   emailAndPassword: {
     enabled: true,
+  },
+  session: {
+    expiresIn: 60 * 60 * 24 * 7,
+    updateAge: 60 * 60 * 24,
+  },
+  schema: {
+    session: {
+      fields: {
+        activeOrganizationId: {
+          type: "string",
+          required: false,
+          defaultValue: () => undefined,
+        },
+      },
+    },
   },
   advanced: {
     defaultCookieAttributes: {
@@ -26,6 +41,7 @@ export const auth = betterAuth({
   },
   plugins: [
     openAPI(),
+    admin(),
     organization({
       allowUserToCreateOrganization: false,
       creatorRole: "admin",
@@ -34,7 +50,7 @@ export const auth = betterAuth({
       },
       accessControl: ac,
       roles: {
-        admin,
+        adminRole,
         owner,
         member,
       },
