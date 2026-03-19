@@ -14,7 +14,7 @@ import { auth } from "@solar-sales/auth";
  *
  * No UI is rendered here; the user is always redirected.
  */
-export default async function HomePage() {
+export default async function Page() {
   const hdrs = await headers();
 
   // Get server-side session from Better Auth.

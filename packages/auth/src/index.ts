@@ -43,11 +43,15 @@ export const auth = betterAuth({
     openAPI(),
     admin(),
     organization({
-      allowUserToCreateOrganization: false,
+      allowUserToCreateOrganization: async (user) => {
+        if (!user?.role) return false;
+        return user.role === "admin";
+      },
       creatorRole: "admin",
       teams: {
         enabled: false,
       },
+      organizationLimit: 5,
       accessControl: ac,
       roles: {
         adminRole,

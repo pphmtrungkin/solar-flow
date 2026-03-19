@@ -63,6 +63,7 @@ app.get("/", (c) => {
   return c.text("OK");
 });
 
+app.use("/users/*", requireAuth);
 app.route("/users", users);
 
 // Protect customers & leads & notes with both auth + active org

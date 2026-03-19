@@ -7,7 +7,7 @@ import { Alert } from "@/components/alert";
 
 type AlertType = "success" | "error" | null;
 
-export default function LoginPage() {
+export default function Page() {
   const [showPassword, setShowPassword] = React.useState(false);
   const [submitting, setSubmitting] = React.useState(false);
   const [alertType, setAlertType] = React.useState<AlertType>(null);

@@ -1,6 +1,6 @@
 "use client";
 
-export default function NoOrgPage() {
+export default function Page() {
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="card bg-base-200 shadow-xl max-w-lg w-full">

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-export default function SignupPage() {
+export default function Page() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 

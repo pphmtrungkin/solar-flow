@@ -1,20 +1,42 @@
-"use server";
+"use client";
 
-import { headers } from "next/headers";
-import { auth } from "@solar-sales/auth";
+import { authClient } from "@/lib/auth-client";
 
-export default async function DashboardPage() {
-  const hdrs = await headers();
+// Extend Better Auth session type locally to include activeOrganizationId
+interface ExtendedSession {
+  user: {
+    id: string;
+    name?: string | null;
+    email: string;
+  };
+  session: {
+    id: string;
+    activeOrganizationId?: string | null;
+  };
+}
 
-  // Get server-side session from Better Auth
-  // Assumes the shape is `{ user, session } | null`
-  const session = await auth.api.getSession({ headers: hdrs });
+export default function Page() {
+  const { data, error, isPending } = authClient.useSession();
 
-  console.log(session);
+  if (isPending) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <span
+          className="loading loading-spinner"
+          aria-label="Loading dashboard"
+        />
+      </div>
+    );
+  }
 
-  // At this point, user is authenticated AND has an active org
-  const userName = session?.user.name ?? "User";
-  const activeOrgId = session?.session.activeOrganizationId;
+  if (error || !data) {
+    // Optionally redirect to /login using useRouter, but for now render nothing
+    return null;
+  }
+
+  const extended = data as ExtendedSession;
+  const userName = extended.user.name ?? "User";
+  const activeOrgId = extended.session.activeOrganizationId ?? "none";
 
   return (
     <div className="container mx-auto max-w-3xl px-4 py-4">
@@ -29,9 +51,9 @@ export default async function DashboardPage() {
           <div className="card-body">
             <h2 className="card-title">Overview</h2>
             <p className="text-sm text-base-content/70">
-              This dashboard is protected by server-side authentication and
-              organization checks. Only users with an active organization can
-              view this page.
+              This dashboard is protected by authentication and organization
+              checks. Only users with an active organization should see this
+              page.
             </p>
           </div>
         </div>

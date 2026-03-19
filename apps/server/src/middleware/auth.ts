@@ -30,6 +30,10 @@ export const requireAdmin = createMiddleware<AppVars>(async (c, next) => {
     return c.json({ error: "Forbidden", message: "Admin required" }, 403);
   }
 
+  if (session.user.role !== "admin") {
+    return c.json({ error: "Forbidden", message: "Admin required" }, 403);
+  }
+
   await next();
 });
 
