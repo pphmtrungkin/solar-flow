@@ -1,10 +1,11 @@
 "use server";
 
-import Sidebar from "@/components/side-bar";
+import Sidebar, { type SidebarItem } from "@/components/side-bar";
 import TopNav from "@/components/top-bar";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { auth } from "@solar-sales/auth";
+import { Home, Users, Settings } from "lucide-react";
 
 export default async function DashboardLayout({
   children,
@@ -25,9 +26,17 @@ export default async function DashboardLayout({
 
   const drawerId = "dashboard-drawer";
 
+  const navItems: SidebarItem[] = [
+    { label: "Main", type: "title" },
+    { label: "Dashboard", href: "/dashboard", icon: Home, active: true },
+    { label: "Team", href: "/team", icon: Users, badge: 3 },
+    { label: "System", type: "title" },
+    { label: "Settings", href: "/settings", icon: Settings },
+  ];
+
   return (
     <section className="w-full">
-      <Sidebar checkboxId={drawerId}>
+      <Sidebar checkboxId={drawerId} items={navItems}>
         <TopNav checkboxId={drawerId} />
         {children}
       </Sidebar>
