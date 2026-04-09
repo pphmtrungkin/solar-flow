@@ -10,6 +10,7 @@ export const env = createEnv({
     BETTER_AUTH_URL: pipe(string(), url()),
     CORS_ORIGIN: pipe(string(), url()),
     NODE_ENV: picklist(nodeEnv),
+    RESEND_API_KEY: pipe(string(), minLength(3)),
   },
   runtimeEnv: process.env,
   emptyStringAsUndefined: true,

@@ -39,7 +39,7 @@ export default function Page() {
   const activeOrgId = extended.session.activeOrganizationId ?? "none";
 
   return (
-    <div className="container mx-auto max-w-3xl px-4 py-4">
+    <div className="container mx-auto max-w-4xl px-4 py-4">
       <h1 className="text-2xl font-semibold mb-2">Dashboard</h1>
       <p className="mb-4">
         Welcome {userName} (Org: {activeOrgId})

@@ -4,6 +4,7 @@ import { type SidebarItem } from "@/components/side-bar";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { auth } from "@solar-sales/auth";
+import TopNav from "@/components/top-bar";
 
 const sidebarItems: SidebarItem[] = [
   { label: "Management", type: "title" },
@@ -47,7 +48,7 @@ export default async function AdminLayout({
   }
 
   return (
-    <div className="flex h-screen w-full">
+    <section className="w-full">
       <Sidebar
         checkboxId="admin-drawer"
         items={sidebarItems}
@@ -55,8 +56,9 @@ export default async function AdminLayout({
         subtitle="System Control"
         headerIcon={<ShieldCheck className="h-8 w-8 text-primary-content" />}
       >
+        <TopNav checkboxId="admin-drawer" />
         {children}
       </Sidebar>
-    </div>
+    </section>
   );
 }

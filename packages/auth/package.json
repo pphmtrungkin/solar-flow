@@ -1,5 +1,6 @@
 {
   "name": "@solar-sales/auth",
+  "version": "0.0.0",
   "type": "module",
   "exports": {
     ".": {
@@ -9,16 +10,25 @@
       "default": "./src/*.ts"
     }
   },
-  "scripts": {},
   "dependencies": {
+    "@react-email/components": "0.0.33",
+    "@react-email/render": "1.0.5",
     "@solar-sales/db": "workspace:*",
     "@solar-sales/env": "workspace:*",
     "better-auth": "catalog:",
     "dotenv": "catalog:",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "resend": "^6.1.0",
     "zod": "catalog:"
   },
   "devDependencies": {
     "@solar-sales/config": "workspace:*",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
     "typescript": "catalog:"
+  },
+  "scripts": {
+    "check-types": "tsc --noEmit"
   }
 }

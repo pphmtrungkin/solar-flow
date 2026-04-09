@@ -1,5 +1,15 @@
 "use client";
 
+import React from "react";
+
+/**
+ * AddOrgModal Component
+ *
+ * A refined, centered modal for creating organizations.
+ * Features a solid background to prevent transparency issues,
+ * a darkened backdrop with blur, and high z-index stacking to ensure
+ * it appears above the sidebar and other layout elements.
+ */
 export default function AddOrgModal({
   isOpen,
   setIsOpen,
@@ -7,50 +17,79 @@ export default function AddOrgModal({
   isOpen: boolean;
   setIsOpen: (value: boolean) => void;
 }) {
-  // 1. If not open, return null immediately
   if (!isOpen) return null;
 
-  // 2. Return the JSX directly without the extra { } or ;
   return (
-    <div className="modal modal-open modal-middle fixed inset-0 z-50 flex items-center justify-center">
-      <div className="modal-box relative z-10 bg-base-100 p-6 rounded-xl shadow-2xl border border-base-300">
-        <h3 className="font-bold text-lg mb-4">Add Organization</h3>
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+      {/* Backdrop: Darkened and blurred to isolate the modal */}
+      <div
+        className="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity"
+        onClick={() => setIsOpen(false)}
+        aria-hidden="true"
+      />
 
-        <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-full border p-4 space-y-2">
-          <legend className="fieldset-legend font-semibold">
-            Organization Details
-          </legend>
+      {/* Modal Box: Solid background, centered, and elevated */}
+      <div className="relative bg-base-100 border border-base-300 rounded-2xl shadow-2xl w-full max-w-md p-8 z-10 overflow-hidden">
+        <h3 className="text-2xl font-bold mb-6 text-base-content">
+          Add Organization
+        </h3>
 
-          <label className="label text-sm">Title</label>
-          <input
-            type="text"
-            className="input input-bordered w-full"
-            placeholder="My awesome organization"
-          />
+        <div className="space-y-6">
+          <div className="space-y-4">
+            <div className="form-control w-full">
+              <label className="label py-1">
+                <span className="label-text text-xs font-bold uppercase opacity-50">
+                  Organization Name
+                </span>
+              </label>
+              <input
+                type="text"
+                className="input input-bordered w-full bg-base-200 focus:input-primary transition-all text-base-content"
+                placeholder="e.g. Solar Sales Pty Ltd"
+                autoFocus
+              />
+            </div>
 
-          <label className="label text-sm">Slug</label>
-          <input
-            type="text"
-            className="input input-bordered w-full"
-            placeholder="my-awesome-org"
-          />
-        </fieldset>
+            <div className="form-control w-full">
+              <label className="label py-1">
+                <span className="label-text text-xs font-bold uppercase opacity-50">
+                  Organization Slug
+                </span>
+              </label>
+              <input
+                type="text"
+                className="input input-bordered w-full bg-base-200 focus:input-primary transition-all text-base-content"
+                placeholder="e.g. solar-sales"
+              />
+              <label className="label py-1">
+                <span className="label-text-alt text-[10px] opacity-40">
+                  Used for URLs and identification
+                </span>
+              </label>
+            </div>
+          </div>
 
-        <div className="modal-action mt-6">
-          <button className="btn btn-primary" onClick={() => setIsOpen(false)}>
-            Create
-          </button>
-          <button className="btn" onClick={() => setIsOpen(false)}>
-            Cancel
-          </button>
+          <div className="flex items-center justify-end gap-3 pt-2">
+            <button
+              type="button"
+              className="btn btn-ghost btn-sm font-bold"
+              onClick={() => setIsOpen(false)}
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              className="btn btn-primary btn-sm px-8 font-bold shadow-lg shadow-primary/20"
+              onClick={() => {
+                // TODO: Implement creation logic via Server Action or API
+                setIsOpen(false);
+              }}
+            >
+              Create
+            </button>
+          </div>
         </div>
       </div>
-
-      {/* Backdrop */}
-      <div
-        className="fixed inset-0 bg-black/60 z-0 cursor-pointer"
-        onClick={() => setIsOpen(false)}
-      />
     </div>
   );
 }

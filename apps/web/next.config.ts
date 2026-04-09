@@ -5,7 +5,13 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   typedRoutes: true,
   images: {
-    remotePatterns: [new URL("https://img.daisyui.com/images/stock/**")],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "img.daisyui.com",
+        pathname: "/images/stock/**",
+      },
+    ],
   },
   reactCompiler: true,
 };

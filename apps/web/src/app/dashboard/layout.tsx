@@ -19,10 +19,10 @@ export default async function DashboardLayout({
     redirect("/login");
   }
 
-  // No active org → your no-org / select-org page
-  if (!session.session?.activeOrganizationId) {
-    redirect("/no-org"); // or "/select-org"
-  }
+  // // No active org → your no-org / select-org page
+  // if (!session.session?.activeOrganizationId) {
+  //   redirect("/no-org"); // or "/select-org"
+  // }
 
   const drawerId = "dashboard-drawer";
 
