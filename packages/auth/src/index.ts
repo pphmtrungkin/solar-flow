@@ -3,13 +3,11 @@ import { env } from "@solar-sales/env/server";
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { openAPI, organization, admin } from "better-auth/plugins";
-import { Resend } from "resend";
 import { ac, admin as adminRole, owner, member } from "./permissions";
 import { OrgInvitationEmail } from "./templates/OrgInvitation";
 import { render } from "@react-email/render";
 import React from "react";
-
-const resend = new Resend(env.RESEND_API_KEY);
+import { sendEmail } from "./email";
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
@@ -59,6 +57,7 @@ export const auth = betterAuth({
       },
       async sendInvitationEmail(data) {
         const inviteUrl = `${env.CORS_ORIGIN}/accept-invitation/${data.id}`;
+        console.log(data.id);
         const html = await render(
           React.createElement(OrgInvitationEmail, {
             teamName: data.organization.name,
@@ -67,14 +66,14 @@ export const auth = betterAuth({
             inviteLink: inviteUrl,
           }),
         );
-
-        await resend.emails.send({
-          from: "SolarFlow <no-reply@solarflow.com>",
-          to: data.email,
-          subject: `Invitation to join ${data.organization.name}`,
+        await sendEmail(
+          data.email,
+          "Invitation to join organization",
           html,
-        });
+          `"${data.organization.name}" <${env.GMAIL_USER}>`,
+        );
       },
+      requireEmailVerificationOnInvitation: true,
       creatorRole: "admin",
       teams: {
         enabled: false,

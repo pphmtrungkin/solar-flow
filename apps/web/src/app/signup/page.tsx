@@ -1,19 +1,20 @@
 "use client";
 
+import { authClient } from "@/lib/auth-client";
 import { useState } from "react";
 
 export default function Page() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
 
-    const fullName = formData.get("fullName") as string | null;
-    const email = formData.get("email") as string | null;
-    const password = formData.get("password") as string | null;
-    const confirmPassword = formData.get("confirmPassword") as string | null;
+    const fullName = formData.get("fullName") as string;
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+    const confirmPassword = formData.get("confirmPassword") as string;
 
     if (password !== confirmPassword) {
       // TODO: replace with proper UI feedback
@@ -23,6 +24,18 @@ export default function Page() {
 
     // TODO: replace with authClient or API call
     console.log("signup", { fullName, email, password });
+
+    const { data, error } = await authClient.signUp.email({
+      name: fullName,
+      email,
+      password,
+    });
+    if (error) {
+      console.error("signup error", error);
+      return;
+    } else {
+      console.log("signup success", data);
+    }
   };
 
   return (

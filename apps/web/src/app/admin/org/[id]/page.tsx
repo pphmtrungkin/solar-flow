@@ -85,6 +85,7 @@ export default function OrgMembersPage() {
           email: inviteEmail,
           role: inviteRole as any,
           organizationId: id,
+          resend: true,
         },
       );
 
