@@ -16,7 +16,7 @@ export default async function DashboardLayout({
   const session = await auth.api.getSession({ headers: hdrs });
 
   if (!session?.user) {
-    redirect("/login");
+    redirect("/auth/login");
   }
 
   // // No active org → your no-org / select-org page

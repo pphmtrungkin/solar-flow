@@ -2,8 +2,10 @@
 
 import { authClient } from "@/lib/auth-client";
 import { useState } from "react";
+import { redirect } from "next/navigation";
 
 export default function Page() {
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
@@ -35,6 +37,10 @@ export default function Page() {
       return;
     } else {
       console.log("signup success", data);
+      setPassword("");
+      setShowPassword(false);
+      setShowConfirm(false);
+      redirect("/auth/login");
     }
   };
 
@@ -120,9 +126,8 @@ export default function Page() {
               className="grow"
               required
               placeholder="Password"
-              minLength={8}
-              pattern="(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
-              title="Must be more than 8 characters, including number, lowercase letter, uppercase letter"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
             />
             <button
               type="button"
@@ -164,14 +169,6 @@ export default function Page() {
               )}
             </button>
           </div>
-          <p className="validator-hint hidden text-xs text-error mt-1">
-            Must be more than 8 characters, including:
-            <br />
-            • At least one number
-            <br />
-            • At least one lowercase letter
-            <br />• At least one uppercase letter
-          </p>
 
           {/* Confirm Password */}
           <label className="label mt-3">

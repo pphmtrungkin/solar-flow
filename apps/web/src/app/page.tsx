@@ -23,7 +23,7 @@ export default async function Page() {
 
   // Not authenticated -> login
   if (!session?.user) {
-    redirect("/login");
+    redirect("/auth/login");
   }
 
   const activeOrgId = session.session?.activeOrganizationId;

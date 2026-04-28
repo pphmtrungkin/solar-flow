@@ -179,12 +179,20 @@ export default function Page() {
         </fieldset>
       </form>
 
-      <p className="mt-6 text-center text-sm">
-        Not a member?{" "}
-        <a href="/signup" className="hover:underline">
-          Sign up
-        </a>
-      </p>
+      <div className="mt-4 text-center text-sm space-y-2">
+        <p>
+          <a href="/auth/forgot-password" className="hover:underline">
+            Forgot password?
+          </a>
+        </p>
+
+        <p>
+          Not a member?{" "}
+          <a href="/signup" className="hover:underline">
+            Sign up
+          </a>
+        </p>
+      </div>
     </div>
   );
 }

@@ -2,12 +2,14 @@ import prisma from "@solar-sales/db";
 import { env } from "@solar-sales/env/server";
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
-import { openAPI, organization, admin } from "better-auth/plugins";
+import { openAPI, organization, admin, emailOTP } from "better-auth/plugins";
 import { ac, admin as adminRole, owner, member } from "./permissions";
-import { OrgInvitationEmail } from "./templates/OrgInvitation";
+import OrgInvitationEmail from "./templates/OrgInvitation";
 import { render } from "@react-email/render";
 import React from "react";
 import { sendEmail } from "./email";
+// Link-based verification template no longer needed when using OTP-only verification
+import OTPVerify from "./templates/OTPVerify";
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
@@ -18,7 +20,12 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: true,
+    onExistingUserSignUp: async ({ user }) => {
+      alert(`Someone tried to sign up with ${user.email}`);
+    },
   },
+  // OTP-only workflows are handled by the `emailOTP` plugin below.
+  // We intentionally remove the default link-based verification sender.
   emailVerification: {
     sendOnSignUp: true,
   },
@@ -48,6 +55,27 @@ export const auth = betterAuth({
     },
   },
   plugins: [
+    emailOTP({
+      overrideDefaultEmailVerification: true,
+      async sendVerificationOTP({ email, otp, type }) {
+        const html = await render(
+          React.createElement(OTPVerify, { email, otp, type }),
+        );
+
+        const subject =
+          type === "forget-password"
+            ? "Reset your password"
+            : type === "email-verification"
+              ? "Confirm your email"
+              : "Sending OTP";
+        await sendEmail(
+          email,
+          subject,
+          html,
+          `"SolarFlow" <${env.GMAIL_USER}>`,
+        );
+      },
+    }),
     openAPI(),
     admin(),
     organization({

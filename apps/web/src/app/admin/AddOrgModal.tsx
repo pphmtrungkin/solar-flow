@@ -1,7 +1,5 @@
 "use client";
 
-import React from "react";
-
 /**
  * AddOrgModal Component
  *
@@ -12,19 +10,19 @@ import React from "react";
  */
 export default function AddOrgModal({
   isOpen,
-  setIsOpen,
+  setIsOpenAction,
 }: {
   isOpen: boolean;
-  setIsOpen: (value: boolean) => void;
+  setIsOpenAction: (value: boolean) => void;
 }) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
       {/* Backdrop: Darkened and blurred to isolate the modal */}
       <div
         className="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity"
-        onClick={() => setIsOpen(false)}
+        onClick={() => setIsOpenAction(false)}
         aria-hidden="true"
       />
 
@@ -73,7 +71,7 @@ export default function AddOrgModal({
             <button
               type="button"
               className="btn btn-ghost btn-sm font-bold"
-              onClick={() => setIsOpen(false)}
+              onClick={() => setIsOpenAction(false)}
             >
               Cancel
             </button>
@@ -82,7 +80,7 @@ export default function AddOrgModal({
               className="btn btn-primary btn-sm px-8 font-bold shadow-lg shadow-primary/20"
               onClick={() => {
                 // TODO: Implement creation logic via Server Action or API
-                setIsOpen(false);
+                setIsOpenAction(false);
               }}
             >
               Create

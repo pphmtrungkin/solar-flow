@@ -17,18 +17,13 @@ export default function TopNav({ checkboxId }: { checkboxId: string }) {
   const router = useRouter();
 
   const handleLogout = async () => {
-    try {
-      await authClient.signOut({
-        fetchOptions: {
-          onSuccess: () => {
-            // Force a hard redirect or use router.push to ensure session state is cleared
-            router.push("/login");
-            router.refresh();
-          },
-        },
-      });
-    } catch (error) {
+    const { error } = await authClient.signOut();
+
+    if (error) {
       console.error("Logout failed:", error);
+    } else {
+      router.push("/auth/login");
+      router.refresh();
     }
   };
 

@@ -5,9 +5,12 @@
     "outDir": "dist",
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
     },
-    "jsx": "react-jsx",
-    "jsxImportSource": "hono/jsx"
-  }
+    "skipLibCheck": true,
+    "types": ["bun"],
+    "typeRoots": ["./node_modules/@types"],
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["../packages/**", "../../packages/**", "../../packages/**/**"],
 }

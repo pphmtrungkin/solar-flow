@@ -32,7 +32,7 @@ export default async function AdminLayout({
 
   // 1. Check if user is logged in
   if (!session?.user) {
-    redirect("/login");
+    redirect("/auth/login");
   }
 
   // 2. Check if user is an admin

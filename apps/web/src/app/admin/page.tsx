@@ -68,7 +68,7 @@ export default function AdminPage() {
         </header>
 
         {/* Modal Component */}
-        <AddOrgModal isOpen={isOpen} setIsOpen={setIsOpen} />
+        <AddOrgModal isOpen={isOpen} setIsOpenAction={setIsOpen} />
 
         {/* Search and Filters Bar */}
         <div className="flex flex-col sm:flex-row gap-4 items-center justify-between bg-base-100 p-5 rounded-3xl border border-base-300 shadow-sm">
