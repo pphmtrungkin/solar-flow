@@ -3,11 +3,14 @@
 import { authClient } from "@/lib/auth-client";
 import { useState } from "react";
 import { redirect } from "next/navigation";
+import { useParams } from "next/navigation";
 
 export default function Page() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+
+  const { id: invitationId } = useParams();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -45,7 +48,7 @@ export default function Page() {
   };
 
   return (
-    <div className="my-auto">
+    <div className="mx-auto my-auto">
       <form onSubmit={handleSubmit}>
         <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4">
           <legend className="fieldset-legend">Sign Up</legend>

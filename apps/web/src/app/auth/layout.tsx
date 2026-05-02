@@ -12,9 +12,9 @@ export default async function Layout({
 
   const session = await auth.api.getSession({ headers: hdrs });
 
-  if (session?.user) {
-    redirect("/");
-  }
+  // if (session?.user) {
+  //   redirect("/");
+  // }
 
   return <div>{children}</div>;
 }

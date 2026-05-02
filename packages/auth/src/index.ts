@@ -62,12 +62,15 @@ export const auth = betterAuth({
           React.createElement(OTPVerify, { email, otp, type }),
         );
 
-        const subject =
-          type === "forget-password"
-            ? "Reset your password"
-            : type === "email-verification"
-              ? "Confirm your email"
-              : "Sending OTP";
+        let subject = "Verification Code";
+        if (type === "sign-in") {
+          subject = "Your Sign-in Code";
+        } else if (type === "email-verification") {
+          subject = "Confirm your email address";
+        } else if (type === "forget-password") {
+          subject = "Reset your password";
+        }
+
         await sendEmail(
           email,
           subject,

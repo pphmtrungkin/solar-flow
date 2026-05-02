@@ -34,17 +34,59 @@ export default async function AcceptInvitationPage({
   }
 
   // User is authenticated: now attempt to accept the invitation.
-  const result = await auth.api.acceptInvitation({
-    body: { invitationId },
-    headers: await headers(),
-  });
+  try {
+    const result = await auth.api.acceptInvitation({
+      body: { invitationId },
+      headers: await headers(),
+    });
 
-  if (!result?.invitation) {
+    if (!result?.invitation) {
+      return (
+        <div className="mx-auto my-auto w-full max-w-md p-6">
+          <h1 className="text-2xl font-bold mb-2">Invitation not found</h1>
+          <p className="opacity-70">
+            This invitation link may be invalid, expired, or already accepted.
+          </p>
+          <div className="mt-4">
+            <a className="link" href="/dashboard">
+              Go to dashboard
+            </a>
+          </div>
+        </div>
+      );
+    }
+  } catch (error: any) {
+    // If the error is that the user is not the recipient, show a helpful message.
+    if (error.message?.includes("not the recipient")) {
+      return (
+        <div className="mx-auto my-auto w-full max-w-md p-6">
+          <h1 className="text-2xl font-bold mb-2">Wrong Account</h1>
+          <p className="opacity-70">
+            You are currently logged in as <strong>{session.user.email}</strong>
+            , but this invitation was sent to a different email address.
+          </p>
+          <p className="opacity-70 mt-2">
+            Please log out and use the link again with the correct account.
+          </p>
+          <div className="mt-6 flex gap-4">
+            <a className="btn btn-primary" href="/dashboard">
+              Go to Dashboard
+            </a>
+            <a className="btn btn-outline" href="/auth/login">
+              Switch Account
+            </a>
+          </div>
+        </div>
+      );
+    }
+
+    // For other errors, show a generic error message.
     return (
       <div className="mx-auto my-auto w-full max-w-md p-6">
-        <h1 className="text-2xl font-bold mb-2">Invitation not found</h1>
+        <h1 className="text-2xl font-bold mb-2">Error</h1>
         <p className="opacity-70">
-          This invitation link may be invalid, expired, or already accepted.
+          {error.message ||
+            "An unexpected error occurred while accepting the invitation."}
         </p>
         <div className="mt-4">
           <a className="link" href="/dashboard">
