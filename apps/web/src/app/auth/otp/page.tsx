@@ -43,6 +43,7 @@ function OTPContent() {
   const searchParams = useSearchParams();
   const email = searchParams.get("email") || "";
   const type = searchParams.get("type") || "";
+  const invitationId = searchParams.get("invitationId");
   const { showAlert } = useAlert();
 
   const [otp, setOtp] = useState("");
@@ -53,7 +54,7 @@ function OTPContent() {
 
     setIsLoading(true);
 
-    if (type === "sign-in") {
+    if (type === "sign-in" || type === "email-verification") {
       const { data, error: authError } = await authClient.emailOtp.verifyEmail({
         email,
         otp: code,
@@ -62,7 +63,11 @@ function OTPContent() {
       if (authError) {
         showAlert("error", authError.message as string);
       } else {
-        router.push("/auth/login");
+        if (invitationId) {
+          router.push(`/accept-invitation/${invitationId}` as any);
+        } else {
+          router.push("/auth/login");
+        }
       }
     }
   };
@@ -147,7 +152,10 @@ function OTPContent() {
 
       <div className="text-center pt-8">
         <Link
-          href="/auth/login"
+          href={{
+            pathname: "/auth/login",
+            query: invitationId ? { invitationId } : undefined,
+          }}
           className="text-xs font-black uppercase tracking-[0.2em] opacity-40 hover:opacity-100 transition-opacity"
         >
           Back to Login

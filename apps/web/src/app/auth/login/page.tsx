@@ -1,9 +1,10 @@
 "use client";
 
 import React from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 import { Alert } from "@/components/alert";
+import Link from "next/link";
 
 type AlertType = "success" | "error" | null;
 
@@ -13,13 +14,14 @@ export default function Page() {
   const [alertType, setAlertType] = React.useState<AlertType>(null);
   const [alertMessage, setAlertMessage] = React.useState<string | null>(null);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const invitationId = searchParams.get("invitationId");
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (submitting) return;
 
     const formData = new FormData(e.currentTarget);
-    console.log(formData.get("email") + ": " + formData.get("password"));
     const email = formData.get("email") as string | null;
     const password = formData.get("password") as string | null;
 
@@ -37,7 +39,7 @@ export default function Page() {
       const { data, error } = await authClient.signIn.email({
         email,
         password,
-        callbackURL: "/",
+        callbackURL: invitationId ? `/accept-invitation/${invitationId}` : "/",
         rememberMe: true,
       });
 
@@ -51,7 +53,11 @@ export default function Page() {
       if (data) {
         setAlertType("success");
         setAlertMessage("Login successful. Redirecting…");
-        router.replace("/");
+        if (invitationId) {
+          router.replace(`/accept-invitation/${invitationId}` as any);
+        } else {
+          router.replace("/");
+        }
       }
     } catch (err) {
       console.error("Unexpected login error", err);
@@ -188,9 +194,15 @@ export default function Page() {
 
         <p>
           Not a member?{" "}
-          <a href="/signup" className="hover:underline">
+          <Link
+            href={{
+              pathname: "/auth/signup",
+              query: invitationId ? { invitationId } : undefined,
+            }}
+            className="hover:underline"
+          >
             Sign up
-          </a>
+          </Link>
         </p>
       </div>
     </div>

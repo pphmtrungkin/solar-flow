@@ -16,5 +16,9 @@ export default async function Layout({
   //   redirect("/");
   // }
 
-  return <div>{children}</div>;
+  return (
+    <div className="flex justify-center items-center min-h-screen">
+      {children}
+    </div>
+  );
 }

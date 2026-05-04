@@ -2,15 +2,16 @@
 
 import { authClient } from "@/lib/auth-client";
 import { useState } from "react";
-import { redirect } from "next/navigation";
-import { useParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 
 export default function Page() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
-
-  const { id: invitationId } = useParams();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const invitationId = searchParams.get("invitationId");
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -28,12 +29,13 @@ export default function Page() {
     }
 
     // TODO: replace with authClient or API call
-    console.log("signup", { fullName, email, password });
+    console.log("signup", { fullName, email, password, invitationId });
 
     const { data, error } = await authClient.signUp.email({
       name: fullName,
       email,
       password,
+      callbackURL: invitationId ? `/accept-invitation/${invitationId}` : "/",
     });
     if (error) {
       console.error("signup error", error);
@@ -43,7 +45,15 @@ export default function Page() {
       setPassword("");
       setShowPassword(false);
       setShowConfirm(false);
-      redirect("/auth/login");
+      if (invitationId) {
+        router.replace(
+          `/auth/otp?email=${encodeURIComponent(email)}&type=email-verification&invitationId=${invitationId}` as any,
+        );
+      } else {
+        router.replace(
+          `/auth/otp?email=${encodeURIComponent(email)}&type=email-verification` as any,
+        );
+      }
     }
   };
 
@@ -232,9 +242,15 @@ export default function Page() {
 
       <p className="mt-6 text-center text-sm">
         Already have an account?{" "}
-        <a href="/login" className="hover:underline">
+        <Link
+          href={{
+            pathname: "/auth/login",
+            query: invitationId ? { invitationId } : undefined,
+          }}
+          className="hover:underline"
+        >
           Login
-        </a>
+        </Link>
       </p>
     </div>
   );

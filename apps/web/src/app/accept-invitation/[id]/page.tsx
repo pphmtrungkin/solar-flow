@@ -1,6 +1,7 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { auth } from "@solar-sales/auth";
+import { AcceptButton } from "./accept-button";
 
 export default async function AcceptInvitationPage({
   params,
@@ -12,51 +13,23 @@ export default async function AcceptInvitationPage({
   const { id: invitationId } = await params;
   const resolvedSearchParams = (await searchParams) ?? {};
 
-  // Where to come back after login/signup.
-  const nextUrl = `/accept-invitation/${encodeURIComponent(invitationId)}`;
-
-  // Check session first (do not mutate/accept until authenticated).
+  // Check session first.
   const session = await auth.api.getSession({
     headers: await headers(),
   });
 
   if (!session?.user) {
-    const qs = new URLSearchParams();
-    qs.set("next", nextUrl);
-
-    // Optional: if you ever pass invited email in query (?email=...),
-    // preserve it to prefill login/signup.
-    const emailParam = resolvedSearchParams.email;
-    const invitedEmail = Array.isArray(emailParam) ? emailParam[0] : emailParam;
-    if (invitedEmail) qs.set("email", invitedEmail);
-
-    redirect(`/auth/signup?${qs.toString()}`);
+    redirect(`/auth/login?invitationId=${invitationId}` as any);
   }
 
-  // User is authenticated: now attempt to accept the invitation.
+  // Fetch invitation details.
+  let invitation;
   try {
-    const result = await auth.api.acceptInvitation({
-      body: { invitationId },
+    invitation = await auth.api.getInvitation({
+      query: { id: invitationId },
       headers: await headers(),
     });
-
-    if (!result?.invitation) {
-      return (
-        <div className="mx-auto my-auto w-full max-w-md p-6">
-          <h1 className="text-2xl font-bold mb-2">Invitation not found</h1>
-          <p className="opacity-70">
-            This invitation link may be invalid, expired, or already accepted.
-          </p>
-          <div className="mt-4">
-            <a className="link" href="/dashboard">
-              Go to dashboard
-            </a>
-          </div>
-        </div>
-      );
-    }
   } catch (error: any) {
-    // If the error is that the user is not the recipient, show a helpful message.
     if (error.message?.includes("not the recipient")) {
       return (
         <div className="mx-auto my-auto w-full max-w-md p-6">
@@ -79,14 +52,15 @@ export default async function AcceptInvitationPage({
         </div>
       );
     }
+    throw error;
+  }
 
-    // For other errors, show a generic error message.
+  if (!invitation) {
     return (
       <div className="mx-auto my-auto w-full max-w-md p-6">
-        <h1 className="text-2xl font-bold mb-2">Error</h1>
+        <h1 className="text-2xl font-bold mb-2">Invitation not found</h1>
         <p className="opacity-70">
-          {error.message ||
-            "An unexpected error occurred while accepting the invitation."}
+          This invitation link may be invalid, expired, or already accepted.
         </p>
         <div className="mt-4">
           <a className="link" href="/dashboard">
@@ -97,6 +71,21 @@ export default async function AcceptInvitationPage({
     );
   }
 
-  // Success: send them somewhere useful.
-  redirect("/dashboard");
+  return (
+    <div className="mx-auto my-auto w-full max-w-md p-6">
+      <div className="card bg-base-200 shadow-xl">
+        <div className="card-body">
+          <h2 className="card-title text-2xl font-bold">Join Organization</h2>
+          <p className="mt-2">
+            You have been invited to join{" "}
+            <strong>{invitation.organizationName}</strong> as a{" "}
+            <strong>{invitation.role}</strong>.
+          </p>
+          <div className="card-actions justify-end mt-6">
+            <AcceptButton invitationId={invitationId} />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
