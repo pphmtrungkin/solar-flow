@@ -31,11 +31,14 @@
     "db:watch": "turbo -F @solar-sales/db db:watch",
     "db:stop": "turbo -F @solar-sales/db db:stop",
     "db:down": "turbo -F @solar-sales/db db:down",
+    "db:reset": "turbo -F @solar-sales/db db:reset",
+    "db:seed": "turbo -F @solar-sales/db db:seed",
     "check": "biome check --write ."
   },
   "dependencies": {
     "@better-auth/prisma-adapter": "^1.6.2",
     "@hono/standard-validator": "^0.2.2",
+    "@prisma/client": "^7.8.0",
     "@scalar/hono-api-reference": "^0.9.48",
     "@solar-sales/env": "workspace:*",
     "@types/react": "^19.2.14",
@@ -47,6 +50,7 @@
     "input-otp": "^1.4.2",
     "nodemailer": "^8.0.5",
     "pino": "^10.3.1",
+    "prisma": "^7.8.0",
     "prisma-openapi": "^1.6.0",
     "prisma-valibot-generator": "^1.2.0",
     "react-email": "^5.2.10",

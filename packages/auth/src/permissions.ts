@@ -18,6 +18,8 @@ const ac = createAccessControl(statements);
 
 const admin = ac.newRole({
   ...adminAc.statements,
+  invitation: ["create", "cancel"],
+  member: ["create", "update", "delete"],
   users: ["create", "read", "delete"],
   customers: ["create", "read", "update", "delete"],
 });

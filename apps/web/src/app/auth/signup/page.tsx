@@ -12,6 +12,7 @@ export default function Page() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const invitationId = searchParams.get("invitationId");
+  const invitedEmail = searchParams.get("email") || "";
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -35,7 +36,7 @@ export default function Page() {
       name: fullName,
       email,
       password,
-      callbackURL: invitationId ? `/accept-invitation/${invitationId}` : "/",
+      callbackURL: invitationId ? `/accept-invitation?id=${invitationId}` : "/",
     });
     if (error) {
       console.error("signup error", error);
@@ -104,6 +105,7 @@ export default function Page() {
                   className="grow"
                   placeholder="Email"
                   required
+                  defaultValue={invitedEmail}
                 />
               </label>
               <div className="validator-hint hidden text-xs text-error mt-1">
@@ -245,7 +247,10 @@ export default function Page() {
         <Link
           href={{
             pathname: "/auth/login",
-            query: invitationId ? { invitationId } : undefined,
+            query: {
+              ...(invitationId ? { invitationId } : {}),
+              ...(invitedEmail ? { email: invitedEmail } : {}),
+            },
           }}
           className="hover:underline"
         >

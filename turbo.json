@@ -7,17 +7,10 @@
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
       "outputs": ["dist/**", ".next/**"]
     },
-    "lint": {
-      "dependsOn": ["^lint"]
-    },
     "check-types": {
       "dependsOn": ["^check-types"]
     },
-    "dev": {
-      "cache": false,
-      "persistent": true
-    },
-    "db:push": {
+    "db:down": {
       "cache": false
     },
     "db:generate": {
@@ -27,9 +20,14 @@
       "cache": false,
       "persistent": true
     },
-    "db:studio": {
-      "cache": false,
-      "persistent": true
+    "db:push": {
+      "cache": false
+    },
+    "db:reset": {
+      "cache": false
+    },
+    "db:seed": {
+      "cache": false
     },
     "db:start": {
       "cache": false,
@@ -38,12 +36,20 @@
     "db:stop": {
       "cache": false
     },
+    "db:studio": {
+      "cache": false,
+      "persistent": true
+    },
     "db:watch": {
       "cache": false,
       "persistent": true
     },
-    "db:down": {
-      "cache": false
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "lint": {
+      "dependsOn": ["^lint"]
     }
   }
 }

@@ -16,6 +16,7 @@ export default function Page() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const invitationId = searchParams.get("invitationId");
+  const invitedEmail = searchParams.get("email") || "";
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -39,7 +40,9 @@ export default function Page() {
       const { data, error } = await authClient.signIn.email({
         email,
         password,
-        callbackURL: invitationId ? `/accept-invitation/${invitationId}` : "/",
+        callbackURL: invitationId
+          ? `/accept-invitation?id=${invitationId}`
+          : "/",
         rememberMe: true,
       });
 
@@ -54,7 +57,7 @@ export default function Page() {
         setAlertType("success");
         setAlertMessage("Login successful. Redirecting…");
         if (invitationId) {
-          router.replace(`/accept-invitation/${invitationId}` as any);
+          router.replace(`/accept-invitation?id=${invitationId}` as any);
         } else {
           router.replace("/");
         }
@@ -100,7 +103,13 @@ export default function Page() {
                     <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
                   </g>
                 </svg>
-                <input name="email" type="email" placeholder="Email" required />
+                <input
+                  name="email"
+                  type="email"
+                  placeholder="Email"
+                  required
+                  defaultValue={invitedEmail}
+                />
               </label>
               <div className="validator-hint hidden">
                 Enter valid email address
@@ -197,7 +206,10 @@ export default function Page() {
           <Link
             href={{
               pathname: "/auth/signup",
-              query: invitationId ? { invitationId } : undefined,
+              query: {
+                ...(invitationId ? { invitationId } : {}),
+                ...(invitedEmail ? { email: invitedEmail } : {}),
+              },
             }}
             className="hover:underline"
           >

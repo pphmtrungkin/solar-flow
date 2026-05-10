@@ -14,6 +14,7 @@ import {
   ChevronLeft,
 } from "lucide-react";
 import Link from "next/link";
+import { adminInviteMemberAction } from "@/actions/admin-actions";
 
 interface OrgMember {
   id: string;
@@ -73,24 +74,23 @@ export default function OrgMembersPage() {
     fetchMembers();
   }, [id]);
 
-  const handleAddMember = async (e: React.SubmitEvent) => {
+  const handleAddMember = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!inviteEmail || !id) return;
 
     setIsInviting(true);
     setError(null);
     try {
-      const { error: inviteError } = await authClient.organization.inviteMember(
-        {
-          email: inviteEmail,
-          role: inviteRole as any,
-          organizationId: id,
-          resend: true,
-        },
-      );
+      const result = await adminInviteMemberAction({
+        email: inviteEmail,
+        organizationId: id,
+        role: inviteRole,
+      });
 
-      if (inviteError) {
-        setError(inviteError.message || "Failed to send invitation");
+      if (!result || (result as any).error) {
+        setError(
+          (result as any)?.error?.message || "Failed to send invitation",
+        );
       } else {
         setSuccessMessage(`Invitation successfully sent to ${inviteEmail}`);
         setInviteEmail("");
@@ -103,7 +103,9 @@ export default function OrgMembersPage() {
         }, 2000);
       }
     } catch (err: any) {
-      setError("An unexpected error occurred during invitation.");
+      setError(
+        err.message || "An unexpected error occurred during invitation.",
+      );
     } finally {
       setIsInviting(false);
     }

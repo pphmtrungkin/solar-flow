@@ -87,7 +87,7 @@ export const auth = betterAuth({
         return user.role === "admin";
       },
       async sendInvitationEmail(data) {
-        const inviteUrl = `${env.CORS_ORIGIN}/accept-invitation/${data.id}`;
+        const inviteUrl = `${env.CORS_ORIGIN}/accept-invitation?id=${data.id}&email=${encodeURIComponent(data.email)}`;
         console.log(data.id);
         const html = await render(
           React.createElement(OrgInvitationEmail, {
