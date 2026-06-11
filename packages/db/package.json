@@ -13,8 +13,6 @@
     "db:push": "prisma db push",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
-    "db:reset": "prisma migrate reset --force",
-    "db:seed": "prisma db seed",
     "db:studio": "prisma studio",
     "db:start": "docker compose up -d",
     "db:watch": "docker compose up",
@@ -25,7 +23,6 @@
     "@prisma/adapter-pg": "^7.2.0",
     "@prisma/client": "catalog:",
     "@solar-sales/env": "workspace:*",
-    "@solar-sales/auth": "workspace:*",
     "dotenv": "catalog:",
     "pg": "^8.17.1",
     "zod": "catalog:"
