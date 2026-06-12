@@ -66,7 +66,7 @@ function OTPContent() {
         if (invitationId) {
           router.push(`/accept-invitation?id=${invitationId}` as any);
         } else {
-          router.push("/auth/login");
+          router.push("/");
         }
       }
     }

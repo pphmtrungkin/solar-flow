@@ -1,5 +1,5 @@
 import { PrismaPg } from "@prisma/adapter-pg";
-import { env } from "@solar-sales/env/server";
+import { env } from "@solar-sales/env/db";
 
 import { PrismaClient } from "../prisma/generated/client";
 

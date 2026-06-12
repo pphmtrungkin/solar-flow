@@ -1,5 +1,5 @@
 import prisma from "@solar-sales/db";
-import { env } from "@solar-sales/env/server";
+import { env } from "@solar-sales/env/auth";
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { openAPI, organization, admin, emailOTP } from "better-auth/plugins";
@@ -28,6 +28,7 @@ export const auth = betterAuth({
   // We intentionally remove the default link-based verification sender.
   emailVerification: {
     sendOnSignUp: true,
+    autoSignInAfterVerification: true,
   },
   session: {
     expiresIn: 60 * 60 * 24 * 7,
@@ -46,8 +47,8 @@ export const auth = betterAuth({
   },
   advanced: {
     defaultCookieAttributes: {
-      sameSite: "none",
-      secure: true,
+      sameSite: env.NODE_ENV === "production" ? "none" : "lax",
+      secure: env.NODE_ENV === "production",
       httpOnly: true,
     },
     database: {

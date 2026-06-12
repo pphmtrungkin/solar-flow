@@ -1,5 +1,5 @@
 import nodemailer from "nodemailer";
-import { env } from "@solar-sales/env/server";
+import { env } from "@solar-sales/env/auth";
 
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
