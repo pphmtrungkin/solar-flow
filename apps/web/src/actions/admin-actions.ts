@@ -1,6 +1,7 @@
 "use server";
 
 import { auth } from "@solar-sales/auth";
+import prisma from "@solar-sales/db";
 import { headers } from "next/headers";
 
 /**
@@ -28,7 +29,22 @@ export async function adminInviteMemberAction({
     );
   }
 
-  // 2. Use the server API to create the invitation
+  // 2. Require an owner to exist before adding non-owner roles
+  if (role !== "owner") {
+    const owner = await prisma.member.findFirst({
+      where: { organizationId, role: "owner" },
+    });
+    if (!owner) {
+      return {
+        error: {
+          message:
+            "An owner account must be added before adding admins or members.",
+        },
+      };
+    }
+  }
+
+  // 3. Use the server API to create the invitation
   // This works even if the global admin is not a member of the target organization
   const result = await auth.api.createInvitation({
     body: {

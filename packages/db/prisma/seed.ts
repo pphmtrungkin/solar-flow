@@ -16,7 +16,7 @@ async function main() {
 
   if (!adminUser) {
     console.log("👤 Creating admin user...");
-    const hashedPassword = await hashPassword("password123");
+    const hashedPassword = await hashPassword("Password123!");
 
     adminUser = await prisma.users.create({
       data: {
@@ -47,7 +47,7 @@ async function main() {
 
     if (!account) {
       console.log("🔑 Creating missing credential account for admin...");
-      const hashedPassword = await hashPassword("password123");
+      const hashedPassword = await hashPassword("Password123!");
       await prisma.accounts.create({
         data: {
           userId: adminUser.id,

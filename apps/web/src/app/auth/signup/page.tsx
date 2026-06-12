@@ -5,14 +5,30 @@ import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 
+const MIN_LENGTH = 8;
+
+function getPasswordErrors(pw: string) {
+  const errors: string[] = [];
+  if (pw.length < MIN_LENGTH) errors.push(`At least ${MIN_LENGTH} characters`);
+  if (!/[a-z]/.test(pw)) errors.push("One lowercase letter");
+  if (!/[A-Z]/.test(pw)) errors.push("One uppercase letter");
+  if (!/[0-9]/.test(pw)) errors.push("One number");
+  if (!/[^a-zA-Z0-9]/.test(pw)) errors.push("One special character");
+  return errors;
+}
+
 export default function Page() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [passwordTouched, setPasswordTouched] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
   const invitationId = searchParams.get("invitationId");
   const invitedEmail = searchParams.get("email") || "";
+
+  const passwordErrors = getPasswordErrors(password);
+  const passwordValid = passwordErrors.length === 0;
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -23,14 +39,11 @@ export default function Page() {
     const password = formData.get("password") as string;
     const confirmPassword = formData.get("confirmPassword") as string;
 
+    if (!passwordValid) return;
+
     if (password !== confirmPassword) {
-      // TODO: replace with proper UI feedback
-      console.error("Passwords do not match");
       return;
     }
-
-    // TODO: replace with authClient or API call
-    console.log("signup", { fullName, email, password, invitationId });
 
     const { data, error } = await authClient.signUp.email({
       name: fullName,
@@ -142,7 +155,11 @@ export default function Page() {
               required
               placeholder="Password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                setPasswordTouched(true);
+              }}
+              onBlur={() => setPasswordTouched(true)}
             />
             <button
               type="button"
@@ -151,7 +168,6 @@ export default function Page() {
               aria-label={showPassword ? "Hide password" : "Show password"}
             >
               {showPassword ? (
-                // eye-off icon
                 <svg
                   className="h-4 w-4"
                   xmlns="http://www.w3.org/2000/svg"
@@ -167,7 +183,6 @@ export default function Page() {
                   <path d="M1 1l22 22" />
                 </svg>
               ) : (
-                // eye icon
                 <svg
                   className="h-4 w-4"
                   xmlns="http://www.w3.org/2000/svg"
@@ -184,6 +199,22 @@ export default function Page() {
               )}
             </button>
           </div>
+          {passwordTouched && (
+            <ul className="mt-2 space-y-1 text-xs">
+              {getPasswordErrors(password).map((err) => (
+                <li key={err} className="text-error flex items-center gap-1.5">
+                  <span className="text-error">✕</span>
+                  {err}
+                </li>
+              ))}
+              {passwordValid && (
+                <li className="text-success flex items-center gap-1.5">
+                  <span className="text-success">✓</span>
+                  Password is strong
+                </li>
+              )}
+            </ul>
+          )}
 
           {/* Confirm Password */}
           <label className="label mt-3">
