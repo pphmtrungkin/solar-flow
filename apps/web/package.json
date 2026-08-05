@@ -11,6 +11,7 @@
     "@base-ui/react": "^1.2.0",
     "@prisma/client": "^7.4.2",
     "@solar-sales/auth": "workspace:*",
+    "@solar-sales/db": "workspace:*",
     "@solar-sales/env": "workspace:*",
     "@tanstack/react-form": "^1.28.4",
     "babel-plugin-react-compiler": "^1.0.0",

@@ -22,6 +22,7 @@ interface OrgMember {
   user: {
     name: string;
     email: string;
+    role?: string;
   };
 }
 
@@ -196,7 +197,12 @@ export default function OrgMembersPage() {
                         </span>
                       </div>
                     </div>
-                    <div className="mt-6 sm:mt-0 flex items-center gap-4">
+                    <div className="mt-6 sm:mt-0 flex items-center gap-2">
+                      {member.user.role === "admin" && (
+                        <span className="px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] border-none bg-info/10 text-info">
+                          admin
+                        </span>
+                      )}
                       <span
                         className={`px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] border-none ${
                           member.role === "owner"

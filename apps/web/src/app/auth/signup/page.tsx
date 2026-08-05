@@ -19,9 +19,12 @@ function getPasswordErrors(pw: string) {
 
 export default function Page() {
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [passwordTouched, setPasswordTouched] = useState(false);
+  const [confirmTouched, setConfirmTouched] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
   const invitationId = searchParams.get("invitationId");
@@ -39,12 +42,9 @@ export default function Page() {
     const password = formData.get("password") as string;
     const confirmPassword = formData.get("confirmPassword") as string;
 
-    if (!passwordValid) return;
+    if (!passwordValid || password !== confirmPassword) return;
 
-    if (password !== confirmPassword) {
-      return;
-    }
-
+    setSubmitting(true);
     const { data, error } = await authClient.signUp.email({
       name: fullName,
       email,
@@ -53,9 +53,11 @@ export default function Page() {
     });
     if (error) {
       console.error("signup error", error);
+      setSubmitting(false);
       return;
     } else {
       console.log("signup success", data);
+      setSubmitting(false);
       setPassword("");
       setShowPassword(false);
       setShowConfirm(false);
@@ -227,6 +229,12 @@ export default function Page() {
               className="grow"
               placeholder="Repeat your password"
               required
+              value={confirmPassword}
+              onChange={(e) => {
+                setConfirmPassword(e.target.value);
+                setConfirmTouched(true);
+              }}
+              onBlur={() => setConfirmTouched(true)}
             />
             <button
               type="button"
@@ -266,9 +274,26 @@ export default function Page() {
               )}
             </button>
           </div>
+          {confirmTouched && confirmPassword.length > 0 && (
+            <p
+              className={`mt-1 text-xs ${password === confirmPassword ? "text-success" : "text-error"}`}
+            >
+              {password === confirmPassword
+                ? "✓ Passwords match"
+                : "✕ Passwords do not match"}
+            </p>
+          )}
 
-          <button className="btn btn-neutral mt-4 w-full" type="submit">
-            Sign Up
+          <button
+            className="btn btn-neutral mt-4 w-full"
+            type="submit"
+            disabled={submitting}
+          >
+            {submitting ? (
+              <span className="loading loading-spinner loading-sm" />
+            ) : (
+              "Sign Up"
+            )}
           </button>
         </fieldset>
       </form>

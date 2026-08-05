@@ -26,10 +26,13 @@ const admin = ac.newRole({
 
 const owner = ac.newRole({
   ...ownerAc.statements,
-  leads: ["create", "read", "update", "delete"],
-  users: ["create", "read", "delete"],
-  notes: ["create", "read", "update", "delete"],
-  customers: ["create", "read", "update", "delete"],
+  organization: ["update"],
+  invitation: ["create", "cancel"],
+  member: ["create", "update", "delete"],
+  leads: ["create", "read", "update"],
+  users: ["create", "read", "update"],
+  notes: ["create", "read", "update"],
+  customers: ["create", "read", "update"],
 });
 
 const member = ac.newRole({

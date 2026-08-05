@@ -31,7 +31,7 @@ export async function adminInviteMemberAction({
 
   // 2. Require an owner to exist before adding non-owner roles
   if (role !== "owner") {
-    const owner = await prisma.member.findFirst({
+    const owner = await prisma.members.findFirst({
       where: { organizationId, role: "owner" },
     });
     if (!owner) {

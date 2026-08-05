@@ -29,6 +29,7 @@ enum leadStatus {
   NEW
   IN_PROGRESS
   ASSIGNED
+  CANCELLED
 }
 
 enum appointmentStatus {
@@ -75,6 +76,7 @@ model Users {
   members       Members[]
   invitations   Invitations[]
   leads          Leads[]
+  appointments   Appointments[]
 
   role          String?
   banned        Boolean?    @default(false)
@@ -254,43 +256,43 @@ model Notes {
 model Items {
   id             String        @id @default(dbgenerated("pg_catalog.gen_random_uuid()")) @db.Uuid
   installation   Installations @relation(fields: [installationId], references: [id], onDelete: Cascade)
-  installationId String        @unique      @db.Uuid
+  installationId String        @db.Uuid
+  itemType       interestedItem
 
   createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
 
   @@index([installationId])
   @@map("items")
 }
 
 model Appointments {
-  id          String            @id @default(dbgenerated("pg_catalog.gen_random_uuid()")) @db.Uuid
-  lead        Leads             @relation(fields: [leadId], references: [id], onDelete: Cascade)
-  leadId      String            @unique @db.Uuid // @unique makes it 1:1
+  id            String            @id @default(dbgenerated("pg_catalog.gen_random_uuid()")) @db.Uuid
+  lead          Leads             @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  leadId        String            @unique @db.Uuid
 
-  scheduledAt DateTime
-  status      appointmentStatus @default(PENDING)
+  scheduledAt   DateTime
+  status        appointmentStatus @default(PENDING)
+  confirmedAt   DateTime?
 
-  // For your "2 days before" confirmation workflow
-  confirmedAt DateTime?
+  assignedToId  String?           @db.Uuid
+  assignedTo    Users?            @relation(fields: [assignedToId], references: [id])
 
-  createdAt   DateTime          @default(now())
-  updatedAt   DateTime          @updatedAt
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
 
-  @@index([leadId])
+  @@index([leadId, assignedToId])
   @@map("appointments")
 }
 
 model Installations {
   id          String            @id @default(dbgenerated("pg_catalog.gen_random_uuid()")) @db.Uuid
   lead        Leads             @relation(fields: [leadId], references: [id], onDelete: Cascade)
-  leadId      String            @unique @db.Uuid // @unique makes it 1:1
-  item        Items?
+  leadId      String            @unique @db.Uuid
+  items       Items[]
 
   scheduledAt DateTime
   status      installationStatus @default(PENDING)
-
-  // For your "2 days before" confirmation workflow
   confirmedAt DateTime?
 
   createdAt   DateTime          @default(now())

@@ -11,6 +11,8 @@ import users from "./routes/users";
 import leads from "./routes/leads";
 import customers from "./routes/customers";
 import notes from "./routes/notes";
+import appointments from "./routes/appointments";
+import installations from "./routes/installations";
 import { requireAuth, requireActiveOrg } from "./middleware/auth";
 
 const app = new Hono<{
@@ -75,6 +77,12 @@ app.route("/leads", leads);
 
 app.use("/notes/*", requireAuth, requireActiveOrg);
 app.route("/notes", notes);
+
+app.use("/appointments/*", requireAuth, requireActiveOrg);
+app.route("/appointments", appointments);
+
+app.use("/installations/*", requireAuth, requireActiveOrg);
+app.route("/installations", installations);
 
 app.get(
   "/doc",

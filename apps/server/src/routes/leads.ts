@@ -107,6 +107,31 @@ app.post(
   },
 );
 
+app.patch(
+  "/:id/cancel",
+  describeRoute({
+    tags: ["Leads"],
+    summary: "Mark lead as cancelled (customer declined)",
+    responses: {
+      200: { description: "Lead cancelled" },
+      404: { description: "Lead not found" },
+    },
+  }),
+  validator("param", IdParamsSchema),
+  async (c) => {
+    const { id } = c.req.valid("param");
+    const lead = await prisma.leads.findUnique({ where: { id } });
+    if (!lead) {
+      return c.json({ message: "Not Found" }, 404);
+    }
+    const updated = await prisma.leads.update({
+      where: { id },
+      data: { status: "CANCELLED" },
+    });
+    return c.json(updated, 200);
+  },
+);
+
 app.delete(
   "/:id",
   describeRoute({
